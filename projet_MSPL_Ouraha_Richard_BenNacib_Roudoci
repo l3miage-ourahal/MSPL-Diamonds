@@ -29,7 +29,7 @@ Other natural colors (such as blue, red, or pink) are called “fancy” and the
 - **z**:  Depth inn mm (0--31.8)   
 - **depth**: Total depth of the diamond, expressed as a percentage relative to its average diameter = z / ((x + y) / 2) = 2 * z / (x + y) (43–79)  
 - **table**: Width of the top facet, expressed as a percentage of the diamond’s width (43–95)    
-  
+
 By using this dataset, we decided to answer the question "**What is the most important factor in determining the price of a diamond?**"
  
 ## Methodology
@@ -43,12 +43,16 @@ We initially observed that carat was by far the most influential factor in deter
 In order to assess the influence of other variables, we needed to control for carat, i.e., neutralize its overwhelming effect.  
 To do so, we chose to focus our analysis on diamonds with a carat of approximately 1, as this is the most represented group in the dataset.  
 By examining diamonds inside of this carat range, we could then analyze how other factors such as cut, clarity, and color affect the price.
-
+   
+We concluded that among the physical size measurements (x, y, z, depth, table), carat is the most decisive factor affecting price.   
+So, we decided not to focus further on the individual dimensional variables but rather concentrate on other quality attributes such as cut, clarity, and color, which also influence the price.  
+Our analysis is focused on these characteristics after accounting the carat weight.  
+   
 ### Data Representation Choices
-  
+We have chosen to represent the most of the datas in a light blue, a color that remember diamonds.
 ## Analysis in Literate Programming  
 
-## Conclusion  
+## Conclusion   
 
 ## References  
   
@@ -95,7 +99,7 @@ diamonds_data %>%
   group_by(carat_bin) %>%
   summarise(mean_price = mean(price)) %>%
   ggplot(aes(x = carat_bin, y = mean_price, group = 1)) +
-  geom_line(color = "blue", size = 1) + 
+  geom_line(color = "blue", linewidth = 2) + 
   labs(
     title = "Prix moyen de diamants en fonction du carat",
     x = "Carat",
@@ -106,8 +110,8 @@ diamonds_data %>%
 ```
 
 ```{r, echo = FALSE}
-# Créer des intervalles de carat par pas de 0.2
-breaks <- seq(0, max(diamonds_data$carat), by = 0.2)
+# Create interval step of 0.2 for the carat
+breaks <- seq(0.2, max(diamonds_data$carat)+0.2, by = 0.2)
 
 # Ajouter une colonne avec les tranches de carat
 diamonds_data %>%
@@ -123,65 +127,6 @@ diamonds_data %>%
   ) +
   theme_minimal(base_size = 14) +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
-```
-
-
-Show the frequence of differents types of cut depending on the price
-```{r, echo = FALSE}
-
-breaks <- c(seq(0, 18000, by = 2000), 19000)#price born
-
-labels <- paste(head(breaks, -1), breaks[-1], sep = " - ") # personalised label to avoid scientific writing
-
-diamonds_data %>%
-  mutate(price_bin = cut(price, breaks = breaks, include.lowest = TRUE, labels = labels)) %>%
-  mutate(cut = fct_relevel(cut, "Fair", "Good", "Very Good", "Premium", "Ideal")) %>%  # Organize the different cuts
-  group_by(price_bin, cut) %>%
-  summarise(count = n(), .groups = "drop") %>%
-  group_by(price_bin) %>%
-  mutate(percentage = count / sum(count) * 100) %>% 
-  ggplot(aes(x = price_bin, y = percentage, fill = cut)) +
-  geom_bar(stat = "identity", position = "stack") +
-  labs(
-    title = "Répartition des types de coupes en fonction du prix",
-    x = "Tranches de prix ($)",
-    y = "Pourcentage du type de coupe",
-    fill = "Coupe"
-  ) +
-  theme_minimal(base_size = 15) +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1)) # adjust the text angle to make it fit
-
-```
-
-```{r, echo = FALSE}
-breaks <- c(seq(0, 18000, by = 2000), 19000)#price born
-
-labels <- paste(head(breaks, -1), breaks[-1], sep = " - ") # personalised label to avoid scientific writing
-
-diamonds_data %>%
-  mutate(price_bin = cut(price, breaks = breaks, include.lowest = TRUE, labels = labels)) %>%
-  mutate(clarity = fct_relevel(clarity, "I1", "SI2", "SI1", "VS2", "VS1", "VVS2", "VVS1", "IF")) %>%  # Organize the different clarities
-  group_by(price_bin, clarity) %>%
-  summarise(count = n(), .groups = "drop") %>%
-  group_by(price_bin) %>%
-  mutate(percentage = count / sum(count) * 100) %>%
-  ggplot(aes(x = price_bin, y = percentage, fill = clarity)) +
-  geom_bar(stat = "identity", position = "stack") +
-  labs( 
-    title = "Répartition des types de clarity en fonction du prix",
-    x = "Tranches de prix ($)",
-    y = "Pourcentage du type de clarity",
-    fill = "Clarities"
-  ) +
-  theme_minimal(base_size = 15) +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1)) # adjust the text angle to make it fit
-
-```
-
-```{r, echo = FALSE}
-model <- lm(price ~ carat + cut + color + clarity + depth + table + x + y + z, data = diamonds_data)
-summary(model)
-
 ```
 ```{r, echo = FALSE}
 
@@ -199,18 +144,35 @@ ggplot(diamonds_filtered, aes(x = cut, y = price)) +
     y = "Prix ($)"
   ) +
   theme_minimal(base_size = 15)
-
-
 ```
 
 ```{r, echo = FALSE}
 
-# Filtrage sur ~1 carat et réorganisation des niveaux de clarity
+# Filter on ~1 carat and reorganize by level of clarity ascending
+diamonds_filtered <- diamonds_data %>%
+  filter(carat >= 0.9 & carat <= 1.1) %>%
+    mutate(color = fct_relevel(color, "J", "I", "H", "G", "F", "E", "D"))
+
+# Boxplot for the clarity clarity
+ggplot(diamonds_filtered, aes(x = color, y = price)) +
+  geom_boxplot(fill = "lightblue") +
+  labs(
+    title = "Prix selon la couleur (à carat  ~1)",
+    x = "Clarté",
+    y = "Prix ($)"
+  ) +
+  theme_minimal(base_size = 15)
+
+``` 
+
+```{r, echo = FALSE}
+
+# Filter on ~1 carat and reorganize by level of clarity ascending
 diamonds_filtered <- diamonds_data %>%
   filter(carat >= 0.9 & carat <= 1.1) %>%
   mutate(clarity = fct_relevel(clarity, "I1", "SI2", "SI1", "VS2", "VS1", "VVS2", "VVS1", "IF"))
 
-# Graphique boxplot pour la clarity
+# Boxplot for the clarity clarity
 ggplot(diamonds_filtered, aes(x = clarity, y = price)) +
   geom_boxplot(fill = "lightblue") +
   labs(
@@ -222,23 +184,7 @@ ggplot(diamonds_filtered, aes(x = clarity, y = price)) +
 
 ```
 
-```{r, echo = FALSE}
-# Créer des intervalles de carat par pas de 0.2
-breaks <- seq(0, max(diamonds_data$carat), by = 0.2)
 
-# Ajouter une colonne avec les tranches de carat
-diamonds_data %>%
-  mutate(carat_bin = cut(carat, breaks = breaks, include.lowest = TRUE)) %>%
-  group_by(carat_bin) %>%
-  summarise(count = n()) %>%
-  ggplot(aes(x = carat_bin, y = count)) +
-  geom_bar(stat = "identity", fill = "orchid", color = "black") +
-  labs(
-    title = "Nombre de diamants par tranche de carat (intervalle de 0.2)",
-    x = "Tranche de carat",
-    y = "Nombre de diamants"
-  ) +
-  theme_minimal(base_size = 14) +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))
-```
+
+
 

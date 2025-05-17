@@ -1,21 +1,57 @@
 ---
-title: "MSPL project: Diamands" 
+title: "MSPL project: Diamands"   
 author: "Lilian Ouraha, Doriane Richard, Reza Roudoci, Ahmed Ben Nacib"
 date: "May 20, 2025"
-output: pdf_document
+output: 
+  pdf_document:
+    toc: true  
+    toc_depth: 3    
 ---
-
-## Table of content
+ 
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
 ## Introduction
-This is student project of MSPL using datas found on kaggle about diamonds.
+This is L3 MIAGE students project of MSPL about diamonds.
 The goal of this project is to find the main factor that determine the price of a diamond between several one such as it's carat, it's color, it's width...
 
+To do that, we have taken a dataset found on kaggle about diamonds from 2017. It countains more than 58000 observations and about 10 variables.  
+The variables are:    
+- **price**: The price of the diamond in $ (\$326--\$18,823)  
+- **carat**:  The weight of the diamond in grams (one carat = 0.2 grams) (0.2--5.01)  
+- **cut**:  The quality of the diamond's cut, which strongly influences how it reflects light (Fair, Good, Very Good, Premium, Ideal)    
+- **color**:  The color of diamonds ranges from colorless to light yellow/light brown (‘J’ (worst) to ‘D’ (best)). Colorless diamonds are the rarest  
+Other natural colors (such as blue, red, or pink) are called “fancy” and their color evaluation differs from that of colorless white diamonds.
+- **clarity**:  A measure of the diamond's clarity (I1 (worst), SI2, SI1, VS2, VS1, VVS2, VVS1, IF (best))   
+- **x**:  Length in mm (0--10.74)  
+- **y**:  Width in mm (0--58.9)  
+- **z**:  Depth inn mm (0--31.8)   
+- **depth**: Total depth of the diamond, expressed as a percentage relative to its average diameter = z / ((x + y) / 2) = 2 * z / (x + y) (43–79)  
+- **table**: Width of the top facet, expressed as a percentage of the diamond’s width (43–95)    
+  
+By using this dataset, we decided to answer the question "**What is the most important factor in determining the price of a diamond?**"
+ 
+## Methodology
+### Data Clean-up Procedures
+Before conducting our analysis, we made data cleaning steps to ensure data quality and accuracy:  
+- The first column in the dataset was an unnecessary index variable, which we removed as it added no informational value.  
+- We identified and excluded 20 rows with impossible physical measurements. In fact, some diamonds had a value of 0 for at least one of the dimensions (x, y, or z), which is impossible for a real diamond.  
 
+### Scientific Workflow
+We initially observed that carat was by far the most influential factor in determining a diamond’s price.   
+In order to assess the influence of other variables, we needed to control for carat, i.e., neutralize its overwhelming effect.  
+To do so, we chose to focus our analysis on diamonds with a carat of approximately 1, as this is the most represented group in the dataset.  
+By examining diamonds inside of this carat range, we could then analyze how other factors such as cut, clarity, and color affect the price.
 
+### Data Representation Choices
+  
+## Analysis in Literate Programming  
+
+## Conclusion  
+
+## References  
+  
 
 We first start by reading the input data
 ```{r, echo = FALSE}
@@ -30,8 +66,8 @@ diamonds_data <- diamonds_data %>% select(-1)
 diamonds_data <- diamonds_data %>%
   filter(x > 0 & y > 0 & z > 0)
 
-#diamonds_data %>% arrange(desc(carat)) %>% head(10)
-# diamonds_data 
+# diamonds_data %>% arrange(desc(price)) %>% head(1000)
+diamonds_data 
 ```
 
 
@@ -68,6 +104,28 @@ diamonds_data %>%
   theme_minimal(base_size = 15)
 
 ```
+
+```{r, echo = FALSE}
+# Créer des intervalles de carat par pas de 0.2
+breaks <- seq(0, max(diamonds_data$carat), by = 0.2)
+
+# Ajouter une colonne avec les tranches de carat
+diamonds_data %>%
+  mutate(carat_bin = cut(carat, breaks = breaks, include.lowest = TRUE)) %>%
+  group_by(carat_bin) %>%
+  summarise(count = n()) %>%
+  ggplot(aes(x = carat_bin, y = count)) +
+  geom_bar(stat = "identity", fill = "orchid", color = "black") +
+  labs(
+    title = "Nombre de diamants par tranche de carat (intervalle de 0.2)",
+    x = "Tranche de carat",
+    y = "Nombre de diamants"
+  ) +
+  theme_minimal(base_size = 14) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+
 Show the frequence of differents types of cut depending on the price
 ```{r, echo = FALSE}
 
@@ -120,4 +178,67 @@ diamonds_data %>%
 
 ```
 
+```{r, echo = FALSE}
+model <- lm(price ~ carat + cut + color + clarity + depth + table + x + y + z, data = diamonds_data)
+summary(model)
+
+```
+```{r, echo = FALSE}
+
+# Take only the carat between 0.9 and 1.1
+diamonds_filtered <- diamonds_data %>%
+  filter(carat >= 0.9 & carat <= 1.1) %>%
+  mutate(cut = fct_relevel(cut, "Fair", "Good", "Very Good", "Premium", "Ideal"))
+
+# Graphique boxplot
+ggplot(diamonds_filtered, aes(x = cut, y = price)) +
+  geom_boxplot(fill = "lightblue") +
+  labs(
+    title = "Prix selon la qualité de coupe (à carat ~1)",
+    x = "Qualité de coupe",
+    y = "Prix ($)"
+  ) +
+  theme_minimal(base_size = 15)
+
+
+```
+
+```{r, echo = FALSE}
+
+# Filtrage sur ~1 carat et réorganisation des niveaux de clarity
+diamonds_filtered <- diamonds_data %>%
+  filter(carat >= 0.9 & carat <= 1.1) %>%
+  mutate(clarity = fct_relevel(clarity, "I1", "SI2", "SI1", "VS2", "VS1", "VVS2", "VVS1", "IF"))
+
+# Graphique boxplot pour la clarity
+ggplot(diamonds_filtered, aes(x = clarity, y = price)) +
+  geom_boxplot(fill = "lightblue") +
+  labs(
+    title = "Prix selon la clarté (à carat  ~1)",
+    x = "Clarté",
+    y = "Prix ($)"
+  ) +
+  theme_minimal(base_size = 15)
+
+```
+
+```{r, echo = FALSE}
+# Créer des intervalles de carat par pas de 0.2
+breaks <- seq(0, max(diamonds_data$carat), by = 0.2)
+
+# Ajouter une colonne avec les tranches de carat
+diamonds_data %>%
+  mutate(carat_bin = cut(carat, breaks = breaks, include.lowest = TRUE)) %>%
+  group_by(carat_bin) %>%
+  summarise(count = n()) %>%
+  ggplot(aes(x = carat_bin, y = count)) +
+  geom_bar(stat = "identity", fill = "orchid", color = "black") +
+  labs(
+    title = "Nombre de diamants par tranche de carat (intervalle de 0.2)",
+    x = "Tranche de carat",
+    y = "Nombre de diamants"
+  ) +
+  theme_minimal(base_size = 14) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
 

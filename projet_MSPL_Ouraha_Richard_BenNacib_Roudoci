@@ -13,10 +13,9 @@ output:
 knitr::opts_chunk$set(echo = TRUE)
 ```
 ## Introduction
-This is L3 MIAGE students project of MSPL about diamonds.
-The goal of this project is to find the main factor that determine the price of a diamond between several one such as it's carat, it's color, it's width...
-
-To do that, we have taken a dataset found on kaggle about diamonds from 2017. It countains more than 58000 observations and about 10 variables.  
+This is L3 MIAGE students project of MSPL module about diamonds.
+The goal of this project is to is to identify the key factor that determines the price of a diamond among several variables such as its carat, color, width, and others.
+To do that, we have taken a dataset found on kaggle about diamonds from 2017 , which contains over 58,000 observations and around 10 variables describing the characteristics of diamonds.  
 The variables are:    
 - **price**: The price of the diamond in $ (\$326--\$18,823)  
 - **carat**:  The weight of the diamond in grams (one carat = 0.2 grams) (0.2--5.01)  
@@ -30,7 +29,7 @@ Other natural colors (such as blue, red, or pink) are called “fancy” and the
 - **depth**: Total depth of the diamond, expressed as a percentage relative to its average diameter = z / ((x + y) / 2) = 2 * z / (x + y) (43–79)  
 - **table**: Width of the top facet, expressed as a percentage of the diamond’s width (43–95)    
 
-By using this dataset, we decided to answer the question "**What is the most important factor in determining the price of a diamond?**"
+By using this dataset, we aim to answer the question: "**What is the most important factor in determining a diamond's price?**"
  
 ## Methodology
 ### Data Clean-up Procedures

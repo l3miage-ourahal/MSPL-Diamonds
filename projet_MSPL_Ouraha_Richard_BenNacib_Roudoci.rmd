@@ -1,0 +1,221 @@
+---
+title: "Projet MSPL: Diamants"   
+author: "Lilian Ouraha, Doriane Richard, Reza Roudoci, Ahmed Ben Nacib"
+date: "20 Mai 2025"
+output: 
+  pdf_document:
+    toc: true  
+    toc_depth: 3    
+---
+ 
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+## Introduction
+Ce projet a été réalisé par des étudiants de L3 MIAGE dans le cadre du module MSPL, et porte sur les diamants.  
+L’objectif de ce projet est d’identifier le ou les facteurs clés qui déterminent le prix d’un diamant parmi plusieurs variables telles que son carat, sa couleur, sa largeur et d'autres caractéristiques.  
+Pour cela, nous avons utilisé un jeu de données trouvé sur Kaggle datant de 2017, qui contient plus de 58 000 observations et une dizaine de variables décrivant les caractéristiques physiques et esthétiques des diamants.  
+Les variables sont les suivantes :  
+- **price**:  Le prix du diamant en dollars ($326--$18,823)  
+- **carat**:  Le poids du diamant en grammes (un carat = 0,2 gramme) (0.2--5.01)    
+- **cut**:  La qualité de la taille du diamant, qui influence fortement la manière dont il reflète la lumière (Fair, Good, Very Good, Premium, Ideal).        
+- **color**: La couleur du diamant varie du plus coloré au plus incolore (‘J’ (le moins bon) à ‘D’ (le meilleur)). Les diamants totalement incolores sont les plus rares.
+D'autres couleurs naturelles (comme le bleu, rouge ou rose) sont appelées "fancy" et leur évaluation se fait selon des critères différents.  
+- **clarity**:  Un indice mesurant la pureté du diamant (I1 (le pire), SI2, SI1, VS2, VS1, VVS2, VVS1, IF (le meilleur))  
+- **x**: Longueur en mm (0--10.74)  
+- **y**: Largeur mm (0--58.9)  
+- **z**:  Profondeur en mm (0--31.8)   
+- **depth**: Profondeur totale du diamant, exprimée en pourcentage par rapport à son diamètre moyen = z / ((x + y) / 2) = 2 * z / (x + y) (43–79)    
+- **table**: Largeur de la facette supérieure, exprimée en pourcentage par rapport à la largeur du diamant (43–95)  
+  
+À partir de ce jeu de données, nous cherchons à répondre à la question suivante : "**Quel est le facteur le plus déterminant du prix d’un diamant ?**"  
+ 
+## Methodologie
+### Procédure de nettoyage des données
+Avant de mener notre analyse, nous avons effectué plusieurs étapes de nettoyage afin de garantir la qualité et la fiabilité des données :  
+- La première colonne du jeu de données était une variable d’index inutile, que nous avons supprimée car elle n’apportait aucune information pertinente.  
+- Nous avons identifié et supprimé 20 lignes contenant des mesures physiques impossibles : certaines avaient une valeur de 0 pour l’une des dimensions (x, y ou z), ce qui est physiquement impossible pour un diamant réel.  
+  
+### Démarche scientifique
+Nous avons d’abord observé que le carat (poids) est de loin le facteur le plus influent sur le prix d’un diamant.  
+Pour pouvoir évaluer l’influence des autres variables, il était nécessaire de contrôler l’effet du carat, c’est-à-dire le neutraliser pour mieux comparer les autres critères.  
+Pour cela, nous avons choisi de nous concentrer sur les diamants ayant un carat proche de 1, car ils sont les plus représentés dans le jeu de données.  
+
+En se limitant à cette plage de carat, nous avons pu analyser l’impact des autres caractéristiques comme la taille (cut), la pureté (clarity) et la couleur (color) sur le prix.
+   
+Nous avons également conclu que parmi les mesures physiques (x, y, z, depth, table), c’est le carat qui reste le plus déterminant pour le prix.  
+Ainsi, nous avons choisi de ne pas approfondir davantage les variables dimensionnelles individuelles, et de nous concentrer sur les variables qualitatives (cut, clarity, color) qui ont aussi un impact significatif.  
+
+Notre analyse est donc centrée sur ces caractéristiques, après avoir tenu compte du carat.     
+
+### Choix de représentation graphique  
+TODO Beaucoup de bleu car ça rappel la couleur du diamant
+intervalle de 1 exceptionnellement pour le carat à cause des variables extrèmes.
+Carats à 1 et pas 0.2 car potentiellement difficile d'avoir des infos de coupe pour les plus petits. pour 1 on est sure de tout avoir.
+on a des prix dans le top 10 avec des carats égal à 1.
+## Analyse en programmation lettrée  
+```{r, echo = FALSE, message=FALSE}
+library(tidyverse)
+library(ggplot2)
+# on commence par lire les données
+diamonds_data <- read_delim("./data/diamonds_data.csv",delim=",");
+
+# on ignore la premiere variable car elle est inutile (c'est un index)
+diamonds_data <- diamonds_data %>% select(-1)
+
+# Filtre les x, y et z pour ne garder que ceux qui ont une valeur > 0
+diamonds_data <- diamonds_data %>%
+  filter(x > 0 & y > 0 & z > 0)
+```
+
+Tout d'abord, pour nous familiariser avec notre sujet, nous avons analysé la répartition des diamants en fonction du prix.  
+
+```{r, echo = FALSE, warning=FALSE, message = FALSE}
+# On créé un histogramme avec le prix en abscisse et en ordonnée la quantité de diamants
+ggplot(diamonds_data, aes(x = price)) +
+  geom_histogram(fill = "steelblue", color = "white") + # Créé l'histogramme avec des barres bleu et des bordures blanches
+  scale_x_continuous(limits = c(300, 19000), breaks = seq(0, 19000, 2000)) + # Set la valeur max de l'abscisse de 0 à 190000 avec une marque tout les 2000 et des barres de 300 de large
+  labs(
+    title = "Répartition du prix des diamants",
+    x = "Prix ($)",
+    y = "Nombre de diamants"
+  ) +
+  theme_minimal(base_size = 16)
+```
+Nous avons donc constaté que la majorité des diamants étaient dans le premier tiers de notre échelle de prix et que nous allons donc avoir moins d'observations pour les grandes échelles de prix.
+  
+Suite à cela, nous avons eu une réflexion. Qu'il y avait deux principales catégories de catactéristiques. Les **caractéristiques physiques** comme le poids, la longueur, la largeur et les **caractéristiques esthétiques** comme la couleur la coupe et la clarity du diamant.  
+  
+Nous avons donc commencé par analyser une **caractéristique physique** qui nous semblait pertinante à savoir **le carat** par rapport au prix.
+
+```{r, echo = FALSE}
+# Graph linéaire (courbe) pour estimer le prix moyen des diamants en fonction de leur carats.
+
+# Créé une intervalle personalisée incrémentant de +0.5 de  0 à 4.1 avec un saut final jusqu'au carat maximum à la fin
+breaks <- c(seq(0.1, 4.1, by = 0.5), max(diamonds_data$carat) + 0.1)
+
+diamonds_data %>%
+  mutate(carat_bin = cut(carat, breaks = breaks, include.lowest = TRUE)) %>%
+  group_by(carat_bin) %>%
+  summarise(mean_price = mean(price)) %>%
+  ggplot(aes(x = carat_bin, y = mean_price, group = 1)) +
+  geom_line(color = "blue", linewidth = 2) +  # courbe bleu avec une largeur de 2
+  labs(
+    title = "Prix moyen de diamants en fonction du carat",
+    x = "Carat", 
+    y = "Prix moyen ($)"
+  ) +
+  theme_minimal(base_size = 15)
+
+```
+Nous voyons donc que le carat est très corellé au prix. Nous avons une courbe qui montre que la croissance du prix est presque proportionnelle au carat à l'exception des carats entre 2.1 et 4.1 qui semble comme stagner.  
+Le carat semble donc être extrémement déterminant du prix du moins comme caractéristique physique.  
+
+Cependant, pour comprendre cette variation du prix entre un carat de 2.1 et un carat de 4.1 nous avons fait un autre graph sous forme de geom_bar pour voir la répartition des observations de notre dataset en fonction du carat.
+
+```{r, echo = FALSE}
+# Intervalle personnalisé par incrémentation de +0.2 entre 0.2 et carat maximum +0.2
+breaks <- seq(0.2, max(diamonds_data$carat)+0.2, by = 0.2)
+
+# Diagramme en bar avec en abscisse l'intervalle de carat et en ordonnée le nombre de diamants pour ce carat
+diamonds_data %>%
+  mutate(carat_bin = cut(carat, breaks = breaks, include.lowest = TRUE)) %>%
+  group_by(carat_bin) %>%
+  summarise(count = n()) %>%
+  ggplot(aes(x = carat_bin, y = count)) +
+  geom_bar(stat = "identity", fill = "steelblue", color = "black") +
+  labs(
+    title = "Nombre de diamants par tranche de carat",
+    x = "Tranche de carat",
+    y = "Nombre de diamants"
+  ) +
+  theme_minimal(base_size = 14) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) # ajuste l'angle des valeurs pour que ça rentre
+```
+Ce graph nous montre donc que notre dataset a une majorité d'observations pour des petits carats et que l'intervalle entre 2.1 et 4.1 carats ne contient que très peut d'observations. Ce manque de données justifie probablement le résultat innatendue sur le graph précédent.
+
+Nous en concluons que le carat est la caractéristique physique la plus déterminante du prix. Pour la suite, nous allons essayer de déterminer la caractéristique esthétique la plus déterminante du prix du diamant. En raison du faible nombre d'observations pour les prix élevés et le carats élevés, nous avons décidé de ne prendre que les observations ayant un carat ~1 car nous avons beaucoup d'observations.
+
+Nous avons donc 3 caractéristiques esthétiques à analyser en fonction du prix ayant un carat ~1 à commencer par la qualité de la coupe.
+```{r, echo = FALSE}
+
+# Recupere uniquement les carats entre 0.9 et 1.1 et ordonne les type de coupe de la pire à la meilleure
+diamonds_filtered <- diamonds_data %>%
+  filter(carat >= 0.9 & carat <= 1.1) %>%
+  mutate(cut = fct_relevel(cut, "Fair", "Good", "Very Good", "Premium", "Ideal"))
+
+# Boxplot
+ggplot(diamonds_filtered, aes(x = cut, y = price)) +
+  geom_boxplot(fill = "lightblue") +
+  labs(
+    title = "Prix selon la qualité de coupe (à carat ~1)",
+    x = "Qualité de coupe",
+    y = "Prix ($)"
+  ) +
+  theme_minimal(base_size = 15)
+```
+Ce boxplot nous montre que la qualité de coupe n'a pas un réel impact sur le prix du diamant bien que les qualité "Fair" soient globalement vendu moins cher que les autres. La qualité de coupe ne détermine donc pas le prix.
+
+Ensuite nous avons analysé la couleur du diamant avec un autre boxplot de la même forme.
+```{r, echo = FALSE}
+
+# Recupere uniquement les carats entre 0.9 et 1.1 et ordonne les couleurs de la pire à la meilleure
+diamonds_filtered <- diamonds_data %>%
+  filter(carat >= 0.9 & carat <= 1.1) %>%
+    mutate(color = fct_relevel(color, "J", "I", "H", "G", "F", "E", "D"))
+
+# Boxplot
+ggplot(diamonds_filtered, aes(x = color, y = price)) +
+  geom_boxplot(fill = "lightblue") +
+  labs(
+    title = "Prix selon la couleur (à carat  ~1)",
+    x = "Couleur",
+    y = "Prix ($)"
+  ) +
+  theme_minimal(base_size = 15)
+
+``` 
+Le boxplot nous montre que le prix en moyenne est légérement influencé par la couleur. 
+Cependant on voit très clairement au niveau des valeurs extrémes que la couleur influence le prix. Meilleure la couleur est, plus haut la valeur extrème des prix est. 
+On peut voir que dans l'objectif d'avoir les diamants les plus cher, il faut la couleur D.
+
+
+Enfin, nous avons analysé la dernière caractéristique esthétique, à savoir la clarté, de la même manière que les autres.
+
+```{r, echo = FALSE}
+
+# Recupere uniquement les carats entre 0.9 et 1.1 et ordonne les clarities de la pire à la meilleure
+diamonds_filtered <- diamonds_data %>%
+  filter(carat >= 0.9 & carat <= 1.1) %>%
+  mutate(clarity = fct_relevel(clarity, "I1", "SI2", "SI1", "VS2", "VS1", "VVS2", "VVS1", "IF"))
+
+# Boxplot
+ggplot(diamonds_filtered, aes(x = clarity, y = price)) +
+  geom_boxplot(fill = "lightblue") +
+  labs(
+    title = "Prix selon la clarté (à carat  ~1)",
+    x = "Clarté",
+    y = "Prix ($)"
+  ) +
+  theme_minimal(base_size = 15)
+
+```
+Ici, on voit que la clarté influence très clairement le prix du diamant de manière croissante. Plus on va dans une clarté de qualité, plus le diamant est cher. Au niveau des valeurs extrèmes, on voit qu'il faut absolument avoir la meilleur clarté pour que le prix soit le plus élevé.
+
+
+## Conclusion   
+
+## References   
+TODO: Lien kaggle ou autre sources
+
+
+
+
+
+
+
+
+
+
+
+

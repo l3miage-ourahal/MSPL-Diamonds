@@ -1,7 +1,7 @@
 ---
-title: "MSPL project: Diamands"   
+title: "Projet MSPL: Diamants"   
 author: "Lilian Ouraha, Doriane Richard, Reza Roudoci, Ahmed Ben Nacib"
-date: "May 20, 2025"
+date: "20 Mai 2025"
 output: 
   pdf_document:
     toc: true  
@@ -13,43 +13,44 @@ output:
 knitr::opts_chunk$set(echo = TRUE)
 ```
 ## Introduction
-This is L3 MIAGE students project of MSPL module about diamonds.
-The goal of this project is to is to identify the key factor that determines the price of a diamond among several variables such as its carat, color, width, and others.
-To do that, we have taken a dataset found on kaggle about diamonds from 2017 , which contains over 58,000 observations and around 10 variables describing the characteristics of diamonds.  
-The variables are:    
-- **price**: The price of the diamond in $ (\$326--\$18,823)  
-- **carat**:  The weight of the diamond in grams (one carat = 0.2 grams) (0.2--5.01)  
-- **cut**:  The quality of the diamond's cut, which strongly influences how it reflects light (Fair, Good, Very Good, Premium, Ideal)    
-- **color**:  The color of diamonds ranges from colorless to light yellow/light brown (‘J’ (worst) to ‘D’ (best)). Colorless diamonds are the rarest  
-Other natural colors (such as blue, red, or pink) are called “fancy” and their color evaluation differs from that of colorless white diamonds.
-- **clarity**:  A measure of the diamond's clarity (I1 (worst), SI2, SI1, VS2, VS1, VVS2, VVS1, IF (best))   
-- **x**:  Length in mm (0--10.74)  
-- **y**:  Width in mm (0--58.9)  
-- **z**:  Depth inn mm (0--31.8)   
-- **depth**: Total depth of the diamond, expressed as a percentage relative to its average diameter = z / ((x + y) / 2) = 2 * z / (x + y) (43–79)  
-- **table**: Width of the top facet, expressed as a percentage of the diamond’s width (43–95)    
-
-By using this dataset, we aim to answer the question: "**What is the most important factor in determining a diamond's price?**"
+Ce projet a été réalisé par des étudiants de L3 MIAGE dans le cadre du module MSPL, et porte sur les diamants.  
+L’objectif de ce projet est d’identifier le ou les facteurs clés qui déterminent le prix d’un diamant parmi plusieurs variables telles que son carat, sa couleur, sa largeur et d'autres caractéristiques.  
+Pour cela, nous avons utilisé un jeu de données trouvé sur Kaggle datant de 2017, qui contient plus de 58 000 observations et une dizaine de variables décrivant les caractéristiques physiques et esthétiques des diamants.  
+Les variables sont les suivantes :  
+- **price**:  Le prix du diamant en dollars ($326--$18,823)  
+- **carat**:  Le poids du diamant en grammes (un carat = 0,2 gramme) (0.2--5.01)    
+- **cut**:  La qualité de la taille du diamant, qui influence fortement la manière dont il reflète la lumière (Fair, Good, Very Good, Premium, Ideal).        
+- **color**: La couleur du diamant varie du plus coloré au plus incolore (‘J’ (le moins bon) à ‘D’ (le meilleur)). Les diamants totalement incolores sont les plus rares.
+D'autres couleurs naturelles (comme le bleu, rouge ou rose) sont appelées "fancy" et leur évaluation se fait selon des critères différents.  
+- **clarity**:  Un indice mesurant la pureté du diamant (I1 (le pire), SI2, SI1, VS2, VS1, VVS2, VVS1, IF (le meilleur))  
+- **x**: Longueur en mm (0--10.74)  
+- **y**: Largeur mm (0--58.9)  
+- **z**:  Profondeur en mm (0--31.8)   
+- **depth**: Profondeur totale du diamant, exprimée en pourcentage par rapport à son diamètre moyen = z / ((x + y) / 2) = 2 * z / (x + y) (43–79)    
+- **table**: Largeur de la facette supérieure, exprimée en pourcentage par rapport à la largeur du diamant (43–95)  
+  
+À partir de ce jeu de données, nous cherchons à répondre à la question suivante : "**Quel est le facteur le plus déterminant du prix d’un diamant ?**"  
  
-## Methodology
-### Data Clean-up Procedures
-Before conducting our analysis, we made data cleaning steps to ensure data quality and accuracy:  
-- The first column in the dataset was an unnecessary index variable, which we removed as it added no informational value.  
-- We identified and excluded 20 rows with impossible physical measurements. In fact, some diamonds had a value of 0 for at least one of the dimensions (x, y, or z), which is impossible for a real diamond.  
+## Methodologie
+### Procédure de nettoyage des données
+Avant de mener notre analyse, nous avons effectué plusieurs étapes de nettoyage afin de garantir la qualité et la fiabilité des données :  
+- La première colonne du jeu de données était une variable d’index inutile, que nous avons supprimée car elle n’apportait aucune information pertinente.  
+- Nous avons identifié et supprimé 20 lignes contenant des mesures physiques impossibles : certaines avaient une valeur de 0 pour l’une des dimensions (x, y ou z), ce qui est physiquement impossible pour un diamant réel.  
+  
+### Démarche scientifique
+Nous avons d’abord observé que le carat (poids) est de loin le facteur le plus influent sur le prix d’un diamant.  
+Pour pouvoir évaluer l’influence des autres variables, il était nécessaire de contrôler l’effet du carat, c’est-à-dire le neutraliser pour mieux comparer les autres critères.  
+Pour cela, nous avons choisi de nous concentrer sur les diamants ayant un carat proche de 1, car ils sont les plus représentés dans le jeu de données.  
 
-### Scientific Workflow
-We initially observed that carat was by far the most influential factor in determining a diamond’s price.   
-In order to assess the influence of other variables, we needed to control for carat, i.e., neutralize its overwhelming effect.  
-To do so, we chose to focus our analysis on diamonds with a carat of approximately 1, as this is the most represented group in the dataset.  
-By examining diamonds inside of this carat range, we could then analyze how other factors such as cut, clarity, and color affect the price.
+En se limitant à cette plage de carat, nous avons pu analyser l’impact des autres caractéristiques comme la taille (cut), la pureté (clarity) et la couleur (color) sur le prix.
    
-We concluded that among the physical size measurements (x, y, z, depth, table), carat is the most decisive factor affecting price.   
-So, we decided not to focus further on the individual dimensional variables but rather concentrate on other quality attributes such as cut, clarity, and color, which also influence the price.  
-Our analysis is focused on these characteristics after accounting the carat weight.  
-   
-### Data Representation Choices
+Nous avons également conclu que parmi les mesures physiques (x, y, z, depth, table), c’est le carat qui reste le plus déterminant pour le prix.  
+Ainsi, nous avons choisi de ne pas approfondir davantage les variables dimensionnelles individuelles, et de nous concentrer sur les variables qualitatives (cut, clarity, color) qui ont aussi un impact significatif.  
+
+Notre analyse est donc centrée sur ces caractéristiques, après avoir tenu compte du carat.     
+### Choix de représentation graphique
 We have chosen to represent the most of the datas in a light blue, a color that remember diamonds.
-## Analysis in Literate Programming  
+## Analyse en programmation lettrée  
 
 ## Conclusion   
 
@@ -182,7 +183,6 @@ ggplot(diamonds_filtered, aes(x = clarity, y = price)) +
   theme_minimal(base_size = 15)
 
 ```
-
 
 
 

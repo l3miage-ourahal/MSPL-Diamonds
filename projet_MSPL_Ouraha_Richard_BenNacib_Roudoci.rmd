@@ -48,12 +48,25 @@ Ainsi, nous avons choisi de ne pas approfondir davantage les variables dimension
 
 Notre analyse est donc centrée sur ces caractéristiques, après avoir tenu compte du carat.     
 
-### Choix de représentation graphique  
-TODO Beaucoup de bleu car ça rappel la couleur du diamant
-intervalle de 1 exceptionnellement pour le carat à cause des variables extrèmes.
-Carats à 1 et pas 0.2 car potentiellement difficile d'avoir des infos de coupe pour les plus petits. pour 1 on est sure de tout avoir.
-on a des prix dans le top 10 avec des carats égal à 1.
+### Choix de représentation graphique 
+**Choix des couleurs :**
+La couleur bleue a été choisie pour les éléments visuels (barres, boxplots, courbes) car c'est à cette couleur que l'on imagine lorsqu'on pense à un diamant.
+Beaucoup de bleu car ça rappel la couleur du diamant  
+
+**Boxplots :**
+Les boxplots ont été sélectionnés pour comparer le prix selon des caractéristiques esthétiques telles que la coupe, la couleur et la clarté, à carat constant (~1). Ce type de graphique est particulièrement efficace pour visualiser la dispersion des prix tout en voyant les valeurs extrêmes.
+
+**Histogramme :**
+Nous avons utilisé un histogramme pour l’exploration initiale des prix. Il nous a permis d’identifier rapidement la forte concentration de diamants dans les tranches de prix les plus basses.
+
+**Courbe (line plot) :**
+Nous avons utilisé un line plot pour étudier la relation entre carat et prix moyen. Il nous a permit de visualiser l'évolution du prix moyen en fonction du poids du diamant et de mettre en lumiere la forte corelation entre prix et carat.
+
+**Diagramme en barres (geom_bar) :**
+Nous avons utilisé un geom bar pour analyser la fréquence des carats dans notre dataset. Il nous a permis de détecter un déséquilibre dans la distribution des observations au niveau du carat, ce qui nous a aidé à interpréter le line plot précédent.
+
 ## Analyse en programmation lettrée  
+
 ```{r, echo = FALSE, message=FALSE}
 library(tidyverse)
 library(ggplot2)
@@ -207,15 +220,3 @@ Ici, on voit que la clarté influence très clairement le prix du diamant de man
 
 ## References   
 TODO: Lien kaggle ou autre sources
-
-
-
-
-
-
-
-
-
-
-
-

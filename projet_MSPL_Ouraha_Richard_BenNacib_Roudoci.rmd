@@ -281,4 +281,4 @@ Ainsi, bien que le carat soit le facteur principal dans la détermination du pri
 
 
 ## Références   
-TODO: Lien kaggle ou autre sources
+https://www.kaggle.com/datasets/shivam2503/diamonds

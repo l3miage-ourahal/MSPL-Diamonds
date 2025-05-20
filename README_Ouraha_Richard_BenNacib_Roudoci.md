@@ -1,10 +1,10 @@
 # MSPL-Diamonds
 
 # Groupe
-- Lilian Ouraha
-- Doriane Richard
-- Ahmed Ben Nacib
-- Reza Roudoci
+- Lilian OURAHA
+- Doriane RICHARD
+- Ahmed BEN NACIB
+- Reza ROUDOCI
 
 # Lien du jeu de données
 [URL](https://www.kaggle.com/datasets/shivam2503/diamonds)

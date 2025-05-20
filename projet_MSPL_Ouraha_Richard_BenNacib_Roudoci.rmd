@@ -19,16 +19,16 @@ Le sujet de cette étude porte sur les diamants.
 
 L’objectif de ce projet est d’identifier le ou les facteurs clés qui déterminent le prix d’un diamant parmi plusieurs variables telles que son carat, sa couleur, sa largeur et d'autres caractéristiques.
 
-Pour cela, nous avons utilisé un jeu de données trouvé sur Kaggle datant de 2017. 
+Pour cela, nous avons utilisé un jeu de données trouvé provenant de Kaggle, réalisé par l'entreprise Tiffany&Co en 2017. 
 Il contient plus de 58 000 observations et une dizaine de variables décrivant les caractéristiques physiques et esthétiques des diamants.
 
 Les variables sont les suivantes :  
 
-- **price**:  Le prix du diamant en dollars ($326--$18,823); 
-- **carat**:  Le poids du diamant en grammes (un carat = 0,2 gramme) (0.2--5.01);  
-- **cut**:  La qualité de la taille du diamant, qui influence fortement la manière dont il reflète la lumière (Fair, Good, Very Good, Premium, Ideal);  
-- **color**: La couleur du diamant varie du plus coloré au plus incolore (‘J’ (le moins bon) à ‘D’ (le meilleur)). Les diamants totalement incolores sont les plus rares. D'autres couleurs naturelles (comme le bleu, rouge ou rose) sont appelées "fancy" et leur évaluation se fait selon des critères différents; 
-- **clarity**:  Un indice mesurant la pureté du diamant (I1 (le pire), SI2, SI1, VS2, VS1, VVS2, VVS1, IF (le meilleur)); 
+- **price**:  Le prix du diamant en dollars ($326--$18,823);
+- **carat**:  Le poids du diamant en grammes (un carat = 0,2 gramme) (0.2--5.01); 
+- **cut**:  La qualité de la taille du diamant, qui influence fortement la manière dont il reflète la lumière (Fair, Good, Very Good, Premium, Ideal); 
+- **color**: La couleur du diamant varie du plus coloré au plus incolore (‘J’ (la moins bonne) à ‘D’ (la meilleure)). Les diamants totalement incolores sont les plus rares. D'autres couleurs naturelles (comme le bleu, rouge ou rose) sont appelées "fancy" et leur évaluation se fait selon des critères différents; 
+- **clarity**:  Un indice mesurant la pureté du diamant (I1 (la pire), SI2, SI1, VS2, VS1, VVS2, VVS1, IF (la meilleure)); 
 - **x**: Longueur en mm (0--10.74); 
 - **y**: Largeur mm (0--58.9); 
 - **z**:  Profondeur en mm (0--31.8); 
@@ -41,7 +41,7 @@ Les variables sont les suivantes :
 
 \newpage
 
-## Methodologie
+## Méthodologie
 ### Procédure de nettoyage des données
 Avant de mener notre analyse, nous avons effectué plusieurs étapes de nettoyage afin de garantir la qualité et la fiabilité des données :
 
@@ -57,7 +57,7 @@ Afin d’évaluer plus précisément l’influence des autres variables, il éta
 Pour cela, nous avons choisi de nous concentrer sur les diamants dont le carat est proche de 1. 
 Ce choix s’explique par leur forte présence dans le jeu de données, mais aussi par le fait qu’un poids d’environ un carat offre une bonne diversité au niveau des autres caractéristiques. 
 Par exemple, certaines coupes ou niveaux de clarté sont plus rares, voire inexistants, pour les très faibles carats. 
-À noter que ce sont justement les diamants de faible carat qui sont les plus présents dans le jeu de données.
+À noter que ce sont justement les diamants de faible carat qui sont dans les plus présents dans le jeu de données.
 
 En nous limitant à cette plage de carat, nous avons pu analyser l’impact des autres caractéristiques comme la taille (cut), la pureté (clarity) et la couleur (color) sur le prix.
    
@@ -77,7 +77,7 @@ Les *boxplots* ont été utilisés pour comparer le prix selon des caractéristi
 Nous avons utilisé un histogramme pour l’exploration initiale des prix. Il nous a permis d’identifier rapidement une forte concentration de diamants dans les tranches de prix les plus basses.
 
 **Courbe (*line plot*) :**
-Nous avons utilisé un *line plot* pour étudier la relation entrele le carat et le prix moyen. Il nous a permit de visualiser l'évolution du prix moyen en fonction du poids du diamant, et de mettre en lumière la forte corrélation entre le prix et le carat.
+Nous avons utilisé un *line plot* pour étudier la relation entre le carat et le prix moyen. Il nous a permit de visualiser l'évolution du prix moyen en fonction du poids du diamant, et de mettre en lumière la forte corrélation entre le prix et le carat.
 
 **Diagramme en barres (*geom_bar*) :**
 Nous avons utilisé un *geom_bar* pour analyser la fréquence des carats dans notre jeu de données.
@@ -116,7 +116,7 @@ ggplot(diamonds_data, aes(x = price)) +
   theme_minimal(base_size = 16)
 ```
 
-Nous avons constaté que la majorité des diamants se situaient dans le premier tiers de notre échelle de prix, ce qui implique que disposerons de moins d'observations pour les tranches de prix plus élevées.
+Nous avons constaté que la majorité des diamants se situaient dans le premier tiers de notre échelle de prix, ce qui implique que nous disposerons de moins d'observations pour les tranches de prix plus élevées.
   
 À la suite de ce constat, nous avons eu une réflexion : il existe deux grandes catégories de catactéristiques. 
 D'une part, les **caractéristiques physiques** comme le poids, la longueur ou la largeur; d'autre part, les **caractéristiques esthétiques** comme la couleur, la coupe et la clarté du diamant.  
@@ -160,7 +160,7 @@ diamonds_data %>%
   group_by(carat_bin) %>%
   summarise(count = n()) %>%
   ggplot(aes(x = carat_bin, y = count)) +
-  geom_bar(stat = "identity", fill = "steelblue", color = "black") +
+  geom_bar(stat = "identity", fill = "steelblue") +
   labs(
     title = "Nombre de diamants par tranche de carat",
     x = "Tranche de carat",
@@ -172,7 +172,7 @@ diamonds_data %>%
 
 Ce graphique montre que notre jeu de données contient une majorité d'observations pour de faibles carats, et que l'intervalle entre 2.1 et 4.1 carats ne comporte que très peu d'observations. 
 
-Ce manque de données justifie probablement le résultat inatendu observé sur le graphique précédent.
+Ce manque de données justifie probablement le résultat inattendu observé sur le graphique précédent.
 
 Nous en concluons que le carat est la caractéristique physique la plus déterminante du prix. 
 
@@ -247,7 +247,7 @@ ggplot(diamonds_filtered, aes(x = clarity, y = price)) +
     title = "Prix selon la clarté (à carat  ~1)",
     x = "Clarté",
     y = "Prix ($)"
-  ) +
+  ) + 
   theme_minimal(base_size = 15)
 
 ```
@@ -268,7 +268,7 @@ Parmi les différents facteurs influençant la valeur d’un diamant, le carat, 
 
 Nos analyses ont mis en évidence une corrélation claire entre le carat et le prix : plus un diamant est lourd, plus il tend à coûter cher. 
 
-Cependant, cette relation ne suffit à elle seule à expliquer les écarts de prix, notamment pour les diamants les plus cher.
+Cependant, cette relation ne suffit pas à elle seule à expliquer les écarts de prix, notamment pour les diamants les plus cher.
 
 En effet, un diamant de grande taille n’est pas nécessairement le plus onéreux.
 Par exemple, dans notre jeu de données, le diamant le plus cher pèse 2.29 carats, tandis que le plus lourd atteint 5.1. 

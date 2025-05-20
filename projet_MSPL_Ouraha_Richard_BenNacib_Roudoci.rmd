@@ -87,7 +87,7 @@ Tout d'abord, pour nous familiariser avec notre sujet, nous avons analysé la r�
 # On créé un histogramme avec le prix en abscisse et en ordonnée la quantité de diamants
 ggplot(diamonds_data, aes(x = price)) +
   geom_histogram(fill = "steelblue", color = "white") + # Créé l'histogramme avec des barres bleu et des bordures blanches
-  scale_x_continuous(limits = c(300, 19000), breaks = seq(0, 19000, 2000)) + # Set la valeur max de l'abscisse de 0 à 190000 avec une marque tout les 2000 et des barres de 300 de large
+  scale_x_continuous(limits = c(300, 19000), breaks = seq(0, 19000, 2000)) + # Set la valeur max de l'abscisse de 0 à 19000 avec une marque tout les 2000 et des barres de 300 de large
   labs(
     title = "Répartition du prix des diamants",
     x = "Prix ($)",
@@ -112,7 +112,7 @@ diamonds_data %>%
   group_by(carat_bin) %>%
   summarise(mean_price = mean(price)) %>%
   ggplot(aes(x = carat_bin, y = mean_price, group = 1)) +
-  geom_line(color = "blue", linewidth = 2) +  # courbe bleu avec une largeur de 2
+  geom_line(color = "blue", linewidth = 2) +  # courbe bleue avec une largeur de 2
   labs(
     title = "Prix moyen de diamants en fonction du carat",
     x = "Carat", 
@@ -145,7 +145,7 @@ diamonds_data %>%
   theme_minimal(base_size = 14) +
   theme(axis.text.x = element_text(angle = 45, hjust = 1)) # ajuste l'angle des valeurs pour que ça rentre
 ```
-Ce graph nous montre donc que notre dataset a une majorité d'observations pour des petits carats et que l'intervalle entre 2.1 et 4.1 carats ne contient que très peut d'observations. Ce manque de données justifie probablement le résultat innatendue sur le graph précédent.
+Ce graphe nous montre donc que notre base de données a une majorité d'observations pour des petits carats et que l'intervalle entre 2.1 et 4.1 carats ne contient que très peu d'observations. Ce manque de données justifie probablement le résultat innatendue sur le graphe précédent.
 
 Nous en concluons que le carat est la caractéristique physique la plus déterminante du prix. Pour la suite, nous allons essayer de déterminer la caractéristique esthétique la plus déterminante du prix du diamant. En raison du faible nombre d'observations pour les prix élevés et le carats élevés, nous avons décidé de ne prendre que les observations ayant un carat ~1 car nous avons beaucoup d'observations.
 
@@ -167,7 +167,7 @@ ggplot(diamonds_filtered, aes(x = cut, y = price)) +
   ) +
   theme_minimal(base_size = 15)
 ```
-Ce boxplot nous montre que la qualité de coupe n'a pas un réel impact sur le prix du diamant bien que les qualité "Fair" soient globalement vendu moins cher que les autres. La qualité de coupe ne détermine donc pas le prix.
+Ce boxplot nous montre que la qualité de coupe n'a pas un réel impact sur le prix du diamant bien que les qualités "Fair" soient globalement vendu moins cher que les autres. La qualité de coupe ne détermine donc pas le prix.
 
 Ensuite nous avons analysé la couleur du diamant avec un autre boxplot de la même forme.
 ```{r, echo = FALSE}
